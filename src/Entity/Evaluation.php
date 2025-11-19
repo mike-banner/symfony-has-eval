@@ -30,6 +30,18 @@ class Evaluation
     #[ORM\ManyToOne]
     private ?Criterion $criterion = null;
 
+    #[ORM\Column(type: Types::STRING, length: 255)]
+    private ?string $evaluator = null;
+
+    // ❌ SUPPRESSION DU CHAMP campaign
+    // (correction) + suppression getters/setters correspondants
+
+    public function __construct()
+    {
+        // auto-date
+        $this->createdAt = new \DateTime();
+    }
+
     public function getId(): ?int
     {
         return $this->id;
@@ -43,7 +55,6 @@ class Evaluation
     public function setScore(int $score): static
     {
         $this->score = $score;
-
         return $this;
     }
 
@@ -55,7 +66,6 @@ class Evaluation
     public function setComment(?string $comment): static
     {
         $this->comment = $comment;
-
         return $this;
     }
 
@@ -67,7 +77,6 @@ class Evaluation
     public function setCreatedAt(\DateTime $createdAt): static
     {
         $this->createdAt = $createdAt;
-
         return $this;
     }
 
@@ -79,7 +88,6 @@ class Evaluation
     public function setEstablishment(?Establishment $establishment): static
     {
         $this->establishment = $establishment;
-
         return $this;
     }
 
@@ -91,7 +99,17 @@ class Evaluation
     public function setCriterion(?Criterion $criterion): static
     {
         $this->criterion = $criterion;
+        return $this;
+    }
 
+    public function getEvaluator(): ?string
+    {
+        return $this->evaluator;
+    }
+
+    public function setEvaluator(string $evaluator): static
+    {
+        $this->evaluator = $evaluator;
         return $this;
     }
 }

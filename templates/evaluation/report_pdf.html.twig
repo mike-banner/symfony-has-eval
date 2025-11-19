@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Rapport - {{ establishment.name }}</title>
+    <style>
+        body { font-family: DejaVu Sans, sans-serif; font-size: 12px; }
+        table { border-collapse: collapse; width: 100%; margin-top: 20px; }
+        th, td { border: 1px solid #000; padding: 5px; text-align: left; }
+        th { background-color: #333; color: #fff; }
+        .badge { padding: 3px 6px; border-radius: 4px; color: #fff; }
+        .bg-success { background-color: #28a745; }
+        .bg-info { background-color: #17a2b8; }
+        .bg-warning { background-color: #ffc107; color: #212529; }
+        .bg-danger { background-color: #dc3545; }
+        tfoot th { background-color: #f0f0f0; }
+    </style>
+</head>
+<body>
+    <h2>Rapport d'évaluation : {{ establishment.name }}</h2>
+    <p>Ville : {{ establishment.city }}</p>
+
+    {% if evaluations|length > 0 %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Critère</th>
+                    <th>Score</th>
+                    <th>Commentaire</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for eval in evaluations %}
+                    <tr>
+                        <td>{{ eval.criterion.label }}<br><small>{{ eval.criterion.objective }}</small></td>
+                        <td style="text-align:center;">
+                            <span class="badge
+                                {% if eval.score == 4 %}bg-success
+                                {% elseif eval.score == 3 %}bg-info
+                                {% elseif eval.score == 2 %}bg-warning
+                                {% else %}bg-danger{% endif %}
+                            ">{{ eval.score }}</span>
+                        </td>
+                        <td>{{ eval.comment ?: '—' }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+            <tfoot>
+                <tr>
+                    <th>Moyenne générale</th>
+                    <th colspan="2">
+                        <span class="badge
+                            {% if average >= 3.5 %}bg-success
+                            {% elseif average >= 2.5 %}bg-info
+                            {% elseif average >= 1.5 %}bg-warning
+                            {% else %}bg-danger{% endif %}
+                        ">{{ average }}</span>
+                    </th>
+                </tr>
+            </tfoot>
+        </table>
+    {% else %}
+        <p>Aucune évaluation enregistrée.</p>
+    {% endif %}
+</body>
+</html>

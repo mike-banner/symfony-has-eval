@@ -38,3 +38,8 @@ yarn-error.log
 # ------------------------------
 *.log
 *.cac*
+
+###> phpunit/phpunit ###
+/phpunit.xml
+/.phpunit.cache/
+###< phpunit/phpunit ###

@@ -8,3 +8,40 @@
 /var/
 /vendor/
 ###< symfony/framework-bundle ###
+
+
+# ------------------------------
+# Symfony / PHP
+# ------------------------------
+/vendor/
+/var/
+/.env
+/.env.local
+/.env.test
+/.env.local.php
+
+# ------------------------------
+# Docker
+# ------------------------------
+/docker/php/php.ini
+has_eval_db_data/
+
+# ------------------------------
+# IDE / Editor
+# ------------------------------
+.idea/
+.vscode/
+*.iml
+
+# ------------------------------
+# Node / Frontend (si utilisé)
+# ------------------------------
+/node_modules/
+npm-debug.log
+yarn-error.log
+
+# ------------------------------
+# Logs / Cache / Temporary
+# ------------------------------
+*.log
+*.cac*

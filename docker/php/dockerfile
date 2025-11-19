@@ -1,0 +1,24 @@
+FROM php:8.2-fpm
+
+# Arguments for composer
+ARG COMPOSER_ALLOW_SUPERUSER=1
+
+# Install system deps
+RUN apt-get update && apt-get install -y \
+    git unzip libicu-dev libonig-dev libzip-dev libxml2-dev \
+    zlib1g-dev libpng-dev libpng-tools libjpeg-dev libfreetype6-dev \
+    && docker-php-ext-configure gd --with-jpeg --with-freetype \
+    && docker-php-ext-install -j$(nproc) pdo_mysql intl mbstring zip xml gd opcache
+
+# Install composer
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+
+# Create working dir
+WORKDIR /srv/app
+
+# Copy entrypoint
+COPY ./docker/php/php-entrypoint.sh /usr/local/bin/php-entrypoint.sh
+RUN chmod +x /usr/local/bin/php-entrypoint.sh
+
+# Default command
+CMD ["php-entrypoint.sh"]

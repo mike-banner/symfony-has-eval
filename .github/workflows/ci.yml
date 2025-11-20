@@ -15,7 +15,6 @@ jobs:
 
     services:
       db:
-        # correction : renommé mariadb → db
         image: mariadb:10.11
         env:
           MYSQL_ROOT_PASSWORD: root
@@ -26,12 +25,11 @@ jobs:
         ports:
           - 3306:3306
 
-        # correction : ajout du healthcheck OBLIGATOIRE
         options: >-
-          --health-cmd="mysqladmin ping -h 127.0.0.1 -u symfony --password=symfony"
+          --health-cmd="mysqladmin ping -h localhost -uroot -proot"
           --health-interval=5s
           --health-timeout=5s
-          --health-retries=10
+          --health-retries=20
 
     steps:
       - uses: actions/checkout@v3
@@ -43,28 +41,29 @@ jobs:
           extensions: mbstring, intl, pdo_mysql
           coverage: none
 
-      - name: Wait for DB to be ready
-        # correction : "mariadb" → "db"
+      - name: Wait for DB to be healthy
         run: |
-          for i in {1..15}; do
-            if mysql -h 127.0.0.1 -u symfony -psymfony -e "SELECT 1" > /dev/null 2>&1; then
-              echo "Database is ready!"
+          for i in {1..20}; do
+            if sudo docker inspect --format='{{json .State.Health.Status}}' $(sudo docker ps -qf "ancestor=mariadb:10.11") | grep -q healthy; then
+              echo "MariaDB is healthy!"
               exit 0
             fi
-            echo "Waiting for database..."
+            echo "Waiting for DB to be healthy..."
             sleep 3
           done
-          echo "Database never became ready."
+          echo "Database did not become healthy"
           exit 1
+
+      - name: Create test database explicitly
+        run: |
+          mysql -h 127.0.0.1 -uroot -proot -e "CREATE DATABASE IF NOT EXISTS has_eval_test;"
 
       - name: Install Composer dependencies
         run: composer install --no-interaction --prefer-dist
 
       - name: Run Symfony tests
         env:
-          DATABASE_URL: "mysql://symfony:symfony@127.0.0.1/has_eval_test"
-          # correction : host localhost/127.0.0.1 obligatoire dans Actions
+          DATABASE_URL: "mysql://symfony:symfony@127.0.0.1:3306/has_eval_test"
         run: |
-          php bin/console doctrine:database:create --env=test --if-not-exists
           php bin/console doctrine:schema:update --force --env=test
           php bin/phpunit

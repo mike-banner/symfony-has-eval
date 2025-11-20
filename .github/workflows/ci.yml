@@ -63,7 +63,13 @@ jobs:
 
       - name: Run Symfony tests
         env:
-          DATABASE_URL: "mysql://symfony:symfony@127.0.0.1:3306/has_eval_test"
+          DATABASE_URL: "mysql://symfony:symfony@127.0.0.1/has_eval_test"
         run: |
+          php bin/console doctrine:database:create --env=test --if-not-exists
           php bin/console doctrine:schema:update --force --env=test
+
+          # ajout : charger les fixtures
+          php bin/console doctrine:fixtures:load --env=test --no-interaction
+
           php bin/phpunit
+

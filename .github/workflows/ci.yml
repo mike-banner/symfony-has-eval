@@ -13,11 +13,11 @@ jobs:
 
     env:
       # 👉 On force la bonne URL pour GitHub Actions
-      DATABASE_URL: "mysql://symfony:symfony@mariadb:3306/has_eval_test"
+      DATABASE_URL: "mysql://symfony:symfony@db:3306/has_eval_test"
       APP_ENV: test
 
     services:
-      mariadb:
+      db:
         image: mariadb:10.11
         ports:
           - 3306:3306
@@ -62,7 +62,7 @@ jobs:
 
     - name: Wait for MariaDB to be ready
       run: |
-        until mysql -h mariadb -u symfony -psymfony -e "SELECT 1"; do
+        until mysql -h db -u symfony -psymfony -e "SELECT 1"; do
           sleep 2
         done
 

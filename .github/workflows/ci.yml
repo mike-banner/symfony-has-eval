@@ -11,6 +11,11 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
+    env:
+      # 👉 On force la bonne URL pour GitHub Actions
+      DATABASE_URL: "mysql://symfony:symfony@mariadb:3306/has_eval_test"
+      APP_ENV: test
+
     services:
       mariadb:
         image: mariadb:10.11
@@ -38,6 +43,11 @@ jobs:
         extensions: mbstring, pdo, pdo_mysql, intl, xml
         ini-values: post_max_size=256M, memory_limit=512M
 
+    - name: Install MySQL client
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y default-mysql-client
+
     - name: Get Composer Cache
       id: composer-cache
       uses: actions/cache@v3
@@ -50,15 +60,15 @@ jobs:
     - name: Install Composer dependencies
       run: composer install --no-progress --prefer-dist --optimize-autoloader
 
-    - name: Wait for MariaDB
+    - name: Wait for MariaDB to be ready
       run: |
         until mysql -h mariadb -u symfony -psymfony -e "SELECT 1"; do
           sleep 2
         done
 
-    - name: Create test database
+    - name: Prepare test database (Doctrine)
       run: |
-        php bin/console doctrine:database:create --env=test
+        php bin/console doctrine:database:create --env=test --if-not-exists
         php bin/console doctrine:schema:update --force --env=test
         php bin/console doctrine:fixtures:load --env=test --no-interaction
 
